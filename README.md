@@ -18,7 +18,7 @@ Cibiteng is a grounded, story-driven 2D life-sim RPG about building relationship
 
 <badge>Pre-production</badge>
 
-The repository currently contains the project foundation and design notes. Gameplay scenes and production assets have not been implemented yet.
+The repository now includes a lightweight playable prototype: a camera-following player, a procedural village block, a nearby NPC interaction, and on-screen controls. The map and character are still placeholder art, not final production assets. The prototype has not yet been run in the Godot editor, so target-device testing remains open.
 
 ## Documentation
 
