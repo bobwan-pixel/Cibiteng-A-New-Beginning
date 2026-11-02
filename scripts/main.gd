@@ -158,51 +158,67 @@ func _draw_npc(npc: Dictionary) -> void:
 	var skin := Color(npc["skin"])
 	var hair := Color(npc["hair"])
 	var outfit := Color(npc["outfit"])
+	var outline := Color("#26313a")
+	var highlight := outfit.lightened(0.18)
 
-	# Shadow, body, arms and legs.
-	draw_rect(Rect2(pos + Vector2(-8, 13), Vector2(16, 4)), Color("#40513e"))
-	draw_rect(Rect2(pos + Vector2(-6, 1), Vector2(12, 15)), outfit)
-	draw_rect(Rect2(pos + Vector2(-7, 4), Vector2(3, 9)), outfit.darkened(0.12))
-	draw_rect(Rect2(pos + Vector2(4, 4), Vector2(3, 9)), outfit.darkened(0.12))
-	draw_rect(Rect2(pos + Vector2(-5, 15), Vector2(4, 5)), Color("#30323a"))
-	draw_rect(Rect2(pos + Vector2(1, 15), Vector2(4, 5)), Color("#30323a"))
+	# Ground shadow and a larger 16-bit-style body silhouette.
+	draw_rect(Rect2(pos + Vector2(-9, 17), Vector2(18, 4)), Color("#40513e"))
+	draw_rect(Rect2(pos + Vector2(-7, 1), Vector2(14, 16)), outline)
+	draw_rect(Rect2(pos + Vector2(-6, 2), Vector2(12, 13)), outfit)
+	draw_rect(Rect2(pos + Vector2(-5, 3), Vector2(3, 7)), highlight)
+	draw_rect(Rect2(pos + Vector2(2, 3), Vector2(3, 7)), outfit.darkened(0.18))
+	draw_rect(Rect2(pos + Vector2(-5, 15), Vector2(4, 6)), outline)
+	draw_rect(Rect2(pos + Vector2(1, 15), Vector2(4, 6)), outline)
+	draw_rect(Rect2(pos + Vector2(-6, 20), Vector2(6, 2)), Color("#4b403b"))
+	draw_rect(Rect2(pos + Vector2(0, 20), Vector2(6, 2)), Color("#4b403b"))
 
-	# Face and hair base.
-	draw_rect(Rect2(pos + Vector2(-5, -10), Vector2(10, 12)), skin)
-	draw_rect(Rect2(pos + Vector2(-6, -12), Vector2(12, 5)), hair)
+	# Face, ears and hair base.
+	draw_rect(Rect2(pos + Vector2(-7, -12), Vector2(14, 14)), outline)
+	draw_rect(Rect2(pos + Vector2(-6, -11), Vector2(12, 12)), skin)
+	draw_rect(Rect2(pos + Vector2(-8, -7), Vector2(2, 4)), skin)
+	draw_rect(Rect2(pos + Vector2(6, -7), Vector2(2, 4)), skin)
+	draw_rect(Rect2(pos + Vector2(-7, -14), Vector2(14, 5)), hair)
 
-	# Hair silhouette is deliberately different for every style.
+	# Hair silhouette: each style has a different outline, not just a different color.
 	match str(npc["style"]):
 		"long":
-			draw_rect(Rect2(pos + Vector2(-7, -8), Vector2(3, 18)), hair)
-			draw_rect(Rect2(pos + Vector2(4, -8), Vector2(3, 18)), hair)
-			draw_rect(Rect2(pos + Vector2(-6, -14), Vector2(12, 4)), hair)
+			draw_rect(Rect2(pos + Vector2(-8, -9), Vector2(3, 21)), hair)
+			draw_rect(Rect2(pos + Vector2(5, -9), Vector2(3, 21)), hair)
+			draw_rect(Rect2(pos + Vector2(-7, -16), Vector2(14, 4)), hair)
+			draw_rect(Rect2(pos + Vector2(5, -13), Vector2(3, 3)), hair.lightened(0.12))
 		"spiky":
 			draw_colored_polygon(PackedVector2Array([
-				pos + Vector2(-7, -9), pos + Vector2(-8, -16),
-				pos + Vector2(-3, -13), pos + Vector2(0, -19),
-				pos + Vector2(3, -13), pos + Vector2(8, -16),
-				pos + Vector2(7, -8)
+				pos + Vector2(-8, -10), pos + Vector2(-10, -18),
+				pos + Vector2(-4, -15), pos + Vector2(-1, -22),
+				pos + Vector2(3, -15), pos + Vector2(9, -19),
+				pos + Vector2(8, -8)
 			]), hair)
 		"bob":
-			draw_rect(Rect2(pos + Vector2(-7, -8), Vector2(3, 15)), hair)
-			draw_rect(Rect2(pos + Vector2(4, -8), Vector2(3, 15)), hair)
-			draw_rect(Rect2(pos + Vector2(-6, -14), Vector2(12, 4)), hair)
+			draw_rect(Rect2(pos + Vector2(-8, -9), Vector2(3, 17)), hair)
+			draw_rect(Rect2(pos + Vector2(5, -9), Vector2(3, 17)), hair)
+			draw_rect(Rect2(pos + Vector2(-7, -16), Vector2(14, 4)), hair)
 		"curly":
-			for curl in [Vector2(-5, -12), Vector2(0, -15), Vector2(5, -12), Vector2(-7, -7), Vector2(7, -7)]:
+			for curl in [Vector2(-7, -14), Vector2(-2, -18), Vector2(3, -17), Vector2(7, -13), Vector2(-8, -8), Vector2(8, -8)]:
 				draw_rect(Rect2(pos + curl, Vector2(5, 5)), hair)
 		_:
-			draw_rect(Rect2(pos + Vector2(-6, -13), Vector2(12, 4)), hair)
-			draw_rect(Rect2(pos + Vector2(-6, -8), Vector2(2, 4)), hair)
+			draw_rect(Rect2(pos + Vector2(-7, -15), Vector2(14, 4)), hair)
+			draw_rect(Rect2(pos + Vector2(-7, -9), Vector2(3, 5)), hair)
 
-	# Face details.
-	draw_rect(Rect2(pos + Vector2(-3, -5), Vector2(2, 2)), Color("#29252a"))
-	draw_rect(Rect2(pos + Vector2(2, -5), Vector2(2, 2)), Color("#29252a"))
+	# Eyes and optional glasses.
+	draw_rect(Rect2(pos + Vector2(-4, -5), Vector2(2, 2)), outline)
+	draw_rect(Rect2(pos + Vector2(2, -5), Vector2(2, 2)), outline)
 	if bool(npc["glasses"]):
-		var frame := Color("#242b35")
-		draw_rect(Rect2(pos + Vector2(-5, -6), Vector2(5, 4)), frame)
-		draw_rect(Rect2(pos + Vector2(1, -6), Vector2(5, 4)), frame)
+		var frame := Color("#202832")
+		draw_rect(Rect2(pos + Vector2(-6, -7), Vector2(6, 5)), frame)
+		draw_rect(Rect2(pos + Vector2(1, -7), Vector2(6, 5)), frame)
 		draw_rect(Rect2(pos + Vector2(-1, -5), Vector2(2, 1)), frame)
+		draw_rect(Rect2(pos + Vector2(-5, -6), Vector2(3, 1)), Color("#a8d3d5"))
+
+	# Character name tag makes NPCs easier to identify in the crowded village.
+	var name_text := str(npc["name"])
+	var text_width := ThemeDB.fallback_font.get_string_size(name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+	draw_rect(Rect2(pos + Vector2(-text_width / 2.0 - 4, -31), Vector2(text_width + 8, 11)), Color("#202b38"))
+	draw_string(ThemeDB.fallback_font, pos + Vector2(-text_width / 2.0, -23), name_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Color("#f4f0df"))
 
 func _draw_house(pos: Vector2, roof_color: Color, sign_text: String) -> void:
 	draw_rect(Rect2(pos + Vector2(8, 30), Vector2(150, 88)), Color("#e3d5b9"))
