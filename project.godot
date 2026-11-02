@@ -8,6 +8,7 @@ config_version=5
 
 config/name="Cibiteng: A New Beginning"
 config/description="A grounded 2D life-simulation RPG by KOVEL STUDIO."
+run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 
 [rendering]
