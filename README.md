@@ -27,6 +27,7 @@ The repository now includes a lightweight playable prototype: a camera-following
 - [Development roadmap](docs/ROADMAP.md)
 - [Combat design](docs/systems/COMBAT.md)
 - [NPC design index](docs/characters/NPC_INDEX.md)
+- [NPC visual identity guide](docs/characters/NPC_VISUAL_GUIDE.md)
 
 ## Development setup
 
