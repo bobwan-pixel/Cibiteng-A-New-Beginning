@@ -1,8 +1,41 @@
 extends Node2D
 
 const MAP_SIZE := Vector2(1280, 720)
-const NPC_POSITION := Vector2(470, 260)
-const INTERACTION_DISTANCE := 54.0
+const INTERACTION_DISTANCE := 58.0
+
+# Temporary NPC designs. Each character has a distinct silhouette and palette.
+const NPCS := [
+	{
+		"name": "Pak RT", "position": Vector2(470, 260),
+		"skin": "#bd8968", "hair": "#292d38", "outfit": "#42627b",
+		"style": "short", "glasses": true,
+		"dialogue": "Pagi! Kamu orang baru di Cibiteng, ya? Kalau butuh bantuan soal lingkungan sini, mampir saja ke balai desa."
+	},
+	{
+		"name": "Mira", "position": Vector2(555, 300),
+		"skin": "#e8b995", "hair": "#6b3d2e", "outfit": "#c9788c",
+		"style": "long", "glasses": false,
+		"dialogue": "Hai! Aku Mira. Kalau mau cari jajanan enak, coba warung di dekat pertigaan."
+	},
+	{
+		"name": "Deni", "position": Vector2(260, 300),
+		"skin": "#a9785b", "hair": "#171b24", "outfit": "#d0a64e",
+		"style": "spiky", "glasses": false,
+		"dialogue": "Lagi santai? Sore biasanya anak-anak kumpul di lapangan."
+	},
+	{
+		"name": "Bu Rina", "position": Vector2(900, 300),
+		"skin": "#d7a17f", "hair": "#30252b", "outfit": "#668b78",
+		"style": "bob", "glasses": true,
+		"dialogue": "Jangan lupa jaga kesehatan. Klinik buka sampai sore hari."
+	},
+	{
+		"name": "Fajar", "position": Vector2(1020, 500),
+		"skin": "#c58e6d", "hair": "#b87936", "outfit": "#6474a5",
+		"style": "curly", "glasses": false,
+		"dialogue": "Bro, kalau mau olahraga, lapangan ada di sebelah timur desa."
+	}
+]
 
 var prompt_label: Label
 var dialogue_panel: PanelContainer
@@ -15,8 +48,10 @@ func _ready() -> void:
 	queue_redraw()
 
 func _process(_delta: float) -> void:
-	var near_npc := player.global_position.distance_to(NPC_POSITION) < INTERACTION_DISTANCE
-	prompt_label.visible = near_npc and not dialogue_panel.visible
+	var npc := _get_nearest_npc()
+	prompt_label.visible = not npc.is_empty() and not dialogue_panel.visible
+	if not npc.is_empty():
+		prompt_label.text = "[ E ]  BICARA DENGAN " + str(npc["name"]).to_upper()
 
 	if Input.is_action_just_pressed("ui_cancel"):
 		dialogue_panel.visible = false
@@ -32,11 +67,21 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not interact_pressed:
 		return
 
-	var near_npc := player.global_position.distance_to(NPC_POSITION) < INTERACTION_DISTANCE
-	if near_npc:
+	var npc := _get_nearest_npc()
+	if not npc.is_empty():
 		dialogue_panel.visible = not dialogue_panel.visible
 		if dialogue_panel.visible:
-			dialogue_label.text = "PAK RT\nPagi! Kamu orang baru di Cibiteng, ya? Kalau butuh bantuan soal lingkungan sini, mampir saja ke balai desa."
+			dialogue_label.text = str(npc["name"]).to_upper() + "\n" + str(npc["dialogue"])
+
+func _get_nearest_npc() -> Dictionary:
+	var nearest: Dictionary = {}
+	var nearest_distance := INTERACTION_DISTANCE
+	for npc in NPCS:
+		var distance: float = player.global_position.distance_to(npc["position"])
+		if distance < nearest_distance:
+			nearest_distance = distance
+			nearest = npc
+	return nearest
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
@@ -59,20 +104,20 @@ func _build_hud() -> void:
 	prompt_label = Label.new()
 	prompt_label.text = "[ E ]  BICARA"
 	prompt_label.position = Vector2(14, 308)
-	prompt_label.add_theme_font_size_override("font_size", 12)
+	prompt_label.add_theme_font_size_override("font_size", 11)
 	prompt_label.add_theme_color_override("font_color", Color("#ffe29a"))
 	layer.add_child(prompt_label)
 
 	dialogue_panel = PanelContainer.new()
-	dialogue_panel.position = Vector2(14, 248)
-	dialogue_panel.size = Vector2(612, 78)
+	dialogue_panel.position = Vector2(14, 238)
+	dialogue_panel.size = Vector2(612, 88)
 	dialogue_panel.visible = false
 	layer.add_child(dialogue_panel)
 
 	dialogue_label = Label.new()
 	dialogue_label.text = ""
 	dialogue_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	dialogue_label.add_theme_font_size_override("font_size", 12)
+	dialogue_label.add_theme_font_size_override("font_size", 11)
 	dialogue_label.add_theme_color_override("font_color", Color("#f4f0df"))
 	dialogue_panel.add_child(dialogue_label)
 
@@ -105,10 +150,59 @@ func _draw() -> void:
 		draw_rect(Rect2(tree_pos + Vector2(-15, -9), Vector2(30, 25)), Color("#376d4a"))
 		draw_rect(Rect2(tree_pos + Vector2(-9, -15), Vector2(18, 12)), Color("#4d8755"))
 
-	# NPC placeholder.
-	draw_rect(Rect2(NPC_POSITION + Vector2(-6, 3), Vector2(12, 17)), Color("#39404a"))
-	draw_rect(Rect2(NPC_POSITION + Vector2(-6, -8), Vector2(12, 12)), Color("#f0d7b6"))
-	draw_rect(Rect2(NPC_POSITION + Vector2(-7, -13), Vector2(14, 6)), Color("#292d38"))
+	for npc in NPCS:
+		_draw_npc(npc)
+
+func _draw_npc(npc: Dictionary) -> void:
+	var pos: Vector2 = npc["position"]
+	var skin := Color(npc["skin"])
+	var hair := Color(npc["hair"])
+	var outfit := Color(npc["outfit"])
+
+	# Shadow, body, arms and legs.
+	draw_rect(Rect2(pos + Vector2(-8, 13), Vector2(16, 4)), Color("#40513e"))
+	draw_rect(Rect2(pos + Vector2(-6, 1), Vector2(12, 15)), outfit)
+	draw_rect(Rect2(pos + Vector2(-7, 4), Vector2(3, 9)), outfit.darkened(0.12))
+	draw_rect(Rect2(pos + Vector2(4, 4), Vector2(3, 9)), outfit.darkened(0.12))
+	draw_rect(Rect2(pos + Vector2(-5, 15), Vector2(4, 5)), Color("#30323a"))
+	draw_rect(Rect2(pos + Vector2(1, 15), Vector2(4, 5)), Color("#30323a"))
+
+	# Face and hair base.
+	draw_rect(Rect2(pos + Vector2(-5, -10), Vector2(10, 12)), skin)
+	draw_rect(Rect2(pos + Vector2(-6, -12), Vector2(12, 5)), hair)
+
+	# Hair silhouette is deliberately different for every style.
+	match str(npc["style"]):
+		"long":
+			draw_rect(Rect2(pos + Vector2(-7, -8), Vector2(3, 18)), hair)
+			draw_rect(Rect2(pos + Vector2(4, -8), Vector2(3, 18)), hair)
+			draw_rect(Rect2(pos + Vector2(-6, -14), Vector2(12, 4)), hair)
+		"spiky":
+			draw_colored_polygon(PackedVector2Array([
+				pos + Vector2(-7, -9), pos + Vector2(-8, -16),
+				pos + Vector2(-3, -13), pos + Vector2(0, -19),
+				pos + Vector2(3, -13), pos + Vector2(8, -16),
+				pos + Vector2(7, -8)
+			]), hair)
+		"bob":
+			draw_rect(Rect2(pos + Vector2(-7, -8), Vector2(3, 15)), hair)
+			draw_rect(Rect2(pos + Vector2(4, -8), Vector2(3, 15)), hair)
+			draw_rect(Rect2(pos + Vector2(-6, -14), Vector2(12, 4)), hair)
+		"curly":
+			for curl in [Vector2(-5, -12), Vector2(0, -15), Vector2(5, -12), Vector2(-7, -7), Vector2(7, -7)]:
+				draw_rect(Rect2(pos + curl, Vector2(5, 5)), hair)
+		_:
+			draw_rect(Rect2(pos + Vector2(-6, -13), Vector2(12, 4)), hair)
+			draw_rect(Rect2(pos + Vector2(-6, -8), Vector2(2, 4)), hair)
+
+	# Face details.
+	draw_rect(Rect2(pos + Vector2(-3, -5), Vector2(2, 2)), Color("#29252a"))
+	draw_rect(Rect2(pos + Vector2(2, -5), Vector2(2, 2)), Color("#29252a"))
+	if bool(npc["glasses"]):
+		var frame := Color("#242b35")
+		draw_rect(Rect2(pos + Vector2(-5, -6), Vector2(5, 4)), frame)
+		draw_rect(Rect2(pos + Vector2(1, -6), Vector2(5, 4)), frame)
+		draw_rect(Rect2(pos + Vector2(-1, -5), Vector2(2, 1)), frame)
 
 func _draw_house(pos: Vector2, roof_color: Color, sign_text: String) -> void:
 	draw_rect(Rect2(pos + Vector2(8, 30), Vector2(150, 88)), Color("#e3d5b9"))
