@@ -1,0 +1,26 @@
+; Engine configuration file.
+; Cibiteng: A New Beginning - KOVEL STUDIO
+; Keep settings conservative for low-spec PC and Android targets.
+
+config_version=5
+
+[application]
+
+config/name="Cibiteng: A New Beginning"
+config/description="A grounded 2D life-simulation RPG by KOVEL STUDIO."
+config/features=PackedStringArray("4.2", "GL Compatibility")
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+textures/canvas_textures/default_texture_filter=0
+
+[display]
+
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=960
+window/size/window_height_override=540
+window/stretch/mode="canvas_items"
