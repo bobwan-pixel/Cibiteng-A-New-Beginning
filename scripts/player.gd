@@ -4,20 +4,27 @@ extends CharacterBody2D
 var facing: Vector2 = Vector2.DOWN
 
 func _physics_process(_delta: float) -> void:
-	var direction := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-	if direction.length() > 0.0:
-		facing = direction.normalized()
-	velocity = direction.normalized() * move_speed
+	var direction := Vector2.ZERO
+
+	# Support both WASD and arrow keys without requiring manual Input Map setup.
+	direction.x = float(Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT)) - float(Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT))
+	direction.y = float(Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN)) - float(Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP))
+	direction = direction.normalized()
+
+	if not direction.is_zero_approx():
+		facing = direction
+
+	velocity = direction * move_speed
 	move_and_slide()
 	queue_redraw()
 
 func _draw() -> void:
-	# Temporary original pixel-style placeholder. Replace with an authored sprite later.
-	draw_rect(Rect2(Vector2(-5, -12), Vector2(10, 8)), Color("#263449"))
-	draw_rect(Rect2(Vector2(-4, -11), Vector2(8, 6)), Color("#e8b995"))
-	draw_rect(Rect2(Vector2(-5, -4), Vector2(10, 9)), Color("#e8e9ed"))
-	draw_rect(Rect2(Vector2(-5, 4), Vector2(4, 5)), Color("#263449"))
-	draw_rect(Rect2(Vector2(1, 4), Vector2(4, 5)), Color("#263449"))
-	draw_rect(Rect2(Vector2(-4, -12), Vector2(8, 2)), Color("#20232c"))
-	draw_rect(Rect2(Vector2(-3, -8), Vector2(2, 1)), Color("#20232c"))
-	draw_rect(Rect2(Vector2(2, -8), Vector2(2, 1)), Color("#20232c"))
+	# Lightweight placeholder until the production character spritesheet is ready.
+	draw_rect(Rect2(Vector2(-6, -11), Vector2(12, 17)), Color("#202b38"))
+	draw_rect(Rect2(Vector2(-5, -10), Vector2(10, 7)), Color("#e8b995"))
+	draw_rect(Rect2(Vector2(-5, -3), Vector2(10, 9)), Color("#e3d5b9"))
+	draw_rect(Rect2(Vector2(-5, 6), Vector2(4, 5)), Color("#263449"))
+	draw_rect(Rect2(Vector2(1, 6), Vector2(4, 5)), Color("#263449"))
+	draw_rect(Rect2(Vector2(-5, -12), Vector2(10, 3)), Color("#20232c"))
+	draw_rect(Rect2(Vector2(-4, -7), Vector2(2, 1)), Color("#20232c"))
+	draw_rect(Rect2(Vector2(2, -7), Vector2(2, 1)), Color("#20232c"))
